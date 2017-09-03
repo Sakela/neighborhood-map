@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Valencia Neighborhood Map</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+
+    </header>
+    
+
+    <section id="search-box">
+        <input type="text" placeholder="Search Address">
+        <h3>Sort By: </h3>
+        <select>
+            <option value="Rating">Rating</option>
+            <option value="Area">Area</option>
+            <option value="Alphabetic">Alphabetic</option>
+        </select>
+        <div>
+          <input id="show-listings" type="button" value="Show Listings">
+          <input id="hide-listings" type="button" value="Hide Listings">
+        </div>
+        <div class="list">
+        <h1 data-bind="text: name"></h1>
+            <ul data-bind="foreach: placeList">
+                <li id="list-item" data-bind="click: $root.bindPlaceMarker">
+                    <h3 data-bind="text: name"></h3>
+                    <p data-bind="text: vicinity"></p>
+                    <span data-bind="text: rating"></span>
+                </li>
+                <hr>
+            </ul>
+        </div>
+    </section>
+
+    <div id="details" data-bind="visible: $root.isVisible">
+
+        <div class="detailed-info" data-bind="with: currentPlace">
+            <img class="close-icon" src='img/close-icon.png' data-bind="click: $root.toggleVisibility, ">
+            <h3 data-bind="text: name"></h3>
+            <p data-bind="text: vicinity"></p>
+            <span data-bind="text: phoneNumber"></span>
+            <div data-bind="foreach: images">
+                <img class="details-gallery" src="" data-bind="attr: {src: $data.getUrl({'maxWidth': 200, 'maxHeight': 200})}">
+            </div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+    <script src="js/libs/jquery.min.js"></script>
+    <script src="js/main.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDV2SfPhFHchL_UBJp9HT3b1YG7sjo4GNs&libraries=places&callback=initMap"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+html,body {
+    font-family: Arial, sans-serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#map {
+    height: 100%;
+}
+
+#search-box {
+    background: #000000;
+    position: absolute;
+    z-index: 1;
+    width: 20%;
+    height: 400px;
+    opacity: 0.4;
+    filter: alpha(opacity=90);
+    color: #FFFFFF;
+    left:80%;
+}
+
+#hide-listings,
+#show-listings {
+  width: 49%;
+}
+
+.list {
+    font-size: 12px;
+    font-weight: 300;
+    margin-left: 12px;
+    padding: 0;
+    overflow: auto;
+    height: 75%;
+}
+
+.detailed-info {
+    background: #FFFFFF;
+    position: absolute;
+    z-index: 1;
+    width: 0%;
+    height: 400px;
+    /*opacity: 0.4;
+    filter: alpha(opacity=90);*/
+    transition-timing-function: ease;
+    transition: width 1s;
+    color: #000000;
+    top: 20%;
+    left: 0%;
+    overflow: auto;
+}
+
+.detailed-info.clicked {
+    width: 20%;
+}
+
+.details-gallery {
+    max-width: 70px;
+    max-height: 70px;
+    position: relative;
+    display: inline;
+}
+
+.close-icon {
+    position: relative;
+    display: inline;
+    max-width: 30px;
+    max-height: 30px;
+    margin-left: 90%;
+}
