@@ -1,31 +1,61 @@
 // Create instances for map,infowindow objects and list of locations, and markers
-var map, infowindow;
-var list = [];
-var markers = [];
+var map;
 
 // Model Class to hold the properties for each list item
 var ListItem = function(placeData) {
+    "use strict";
+
     this.name = ko.observable(placeData.name);
     this.id = ko.observable(placeData.place_id);
     this.location = ko.observable();
     this.vicinity = ko.observable(placeData.vicinity);
     this.rating = ko.observable(placeData.rating);
-    // this.photos = ko.observable(placeData.photos[0].getUrl({'maxWidth': 200, 'maxHeight': 200}));
-
     this.phoneNumber = ko.observable(placeData.international_phone_number);
     this.images = ko.observableArray(placeData.photos);
+    this.website = ko.observable(placeData.website);
+    this.reviews = ko.observableArray(placeData.reviews);
+
+    this.showReviews = ko.observable(false);
+
+    this.toggleReviews = function() {
+        this.showReviews(true);
+    }
+
+    this.isVisibleDetails = ko.observable(false);
+
+    this.toggleVisibility = function() {
+        var detailsInfoWindow = $('.detailed-info');
+
+        if (this.isVisibleDetails() !== true) {
+            detailsInfoWindow.toggleClass('clicked');
+            this.isVisibleDetails(true);            
+        } else {
+            detailsInfoWindow.toggleClass('clicked');
+            this.isVisibleDetails(false);
+        }
+    }
 }
 
 // ViewModel that holds KO functions
-function MapViewModel() { 
+var MapViewModel = function() {
+    "use strict"; 
     
-    
-
-    var self = this;
+    var self = this,
+        infowindow = new google.maps.InfoWindow(),
+        service = new google.maps.places.PlacesService(map),
+        list = [],
+        markers = [],
+        showListingsBtn = document.getElementById('show-listings'),
+        hideListingsBtn = document.getElementById('hide-listings');
 
     self.placeList = ko.observableArray([]);
     self.currentPlace = ko.observable();
-    self.isVisible = ko.observable(false);
+    self.enableButton = ko.observable(true);
+    // self.isVisibleDetails = ko.observable(false);
+
+    self.toggleList = function() {
+        $('.list').toggle(100);
+    }
 
     //Handles chosen list item and saves into ViewModel obesrvable property
     self.setCurrentPlace = function(place) {
@@ -42,52 +72,33 @@ function MapViewModel() {
                 //Push locations from the list into Model and call function to create Markers
                 self.placeList.push(new ListItem(place));
                 createMarker(place);
-                
-            } else {
-                alert("error loading" + place + ".");
-            }            
+                console.log(place);
+            }         
         });
     }
 
     self.bindPlaceMarker = function(currentPlace) {
-
-
         // self.getDetails(currentPlace.id(), currentPlace);
         self.setCurrentPlace(currentPlace);
-        self.isVisible(true);
-        console.log(self.currentPlace());
+        self.toggleList();
 
         markers.forEach(function(marker) {
 
             if (currentPlace.id() === marker.id) {
-                // console.log(marker.id);
-                setInfoContent(marker, infowindow);
-                infowindow.open(map, marker);
-                marker.setAnimation(google.maps.Animation.DROP);            
                 
-                
+                if(marker.map !== null) {
+
+                    setInfoContent(marker, infowindow);
+                    infowindow.open(map, marker);
+                    marker.setAnimation(google.maps.Animation.DROP);
+                    map.panTo(marker.position);  
+                }                             
                 // console.log(currentPlace);
             }
         });
 
-        if (self.isVisible() === true) {
-            $('.detailed-info').toggleClass('clicked');
-        } 
-        
-        // console.log(place.photos());
-    }
-
-    self.toggleVisibility = function() {
-        self.isVisible(false);
-        $('.detailed-info').toggleClass('clicked');
-    }
-
-
-    // Create info window for future markers
-    infowindow = new google.maps.InfoWindow();
-
-    // Create Place service for hotels within radius
-    var service = new google.maps.places.PlacesService(map);
+        this.toggleVisibility();
+    }   
 
     service.nearbySearch({
         location: {
@@ -106,81 +117,23 @@ function MapViewModel() {
     // pushes each data into Model, and creates Markers on the map
     function callback(results, status) {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
-            for (var i = 0; i < results.length; i++) {
+
+            var resultsLength = results.length;
+
+            for (var i = 0; i < resultsLength; i++) {
                 var result = results[i];
 
-                // Function looked up from Hackernoon article by Lena Faure.
-                // Using setTimeout and closure because limit of 10 queries /second for getDetails */
-                (function (j) {
-                    var request = {
-                        placeId: results[i]['place_id']
-                    };
-
-                    service = new google.maps.places.PlacesService(map);
-                    setTimeout(function() {
-                        service.getDetails(request, callback);
-                    }, j*300);
-
-
-                })(i);
-
-                function callback(place,status) {
-                    if (status === google.maps.places.PlacesServiceStatus.OK) {
-                        // currentPlace.phoneNumber(place.international_phone_number);
-                        // place.photos.forEach(function(image){
-                        //     currentPlace.images().push(image.getUrl({'maxWidth': 200, 'maxHeight': 200}));
-                        //     console.log(image);
-                        // })
-
-                        self.placeList.push(new ListItem(place));
-                        createMarker(place);
-                        
-                    } else {
-                        alert("error loading" + place + ".");
-                    }           
-                }
-
-                // service.getDetails({
-                //     placeId: result.place_id
-                // }, function(place, status) {
-                //     if (status === google.maps.places.PlacesServiceStatus.OK) {
-                //         // currentPlace.phoneNumber(place.international_phone_number);
-                //         // place.photos.forEach(function(image){
-                //         //     currentPlace.images().push(image.getUrl({'maxWidth': 200, 'maxHeight': 200}));
-                //         //     console.log(image);
-                //         // })
-
-                //         self.placeList.push(new ListItem(place));
-                //         createMarker(place);
-                        
-                //     } else {
-                //         alert("error loading" + place + ".");
-                //     }            
-                // });
-                // console.log(result);                
-                // self.placeList.push(new ListItem(result));
-                // createMarker(result);
-                // list.push(results[i]);
-
-                // self.getDetails(result.place_id, result);
+                self.getDetails(result.place_id, result);
             }
             
         }
-
-        // list.forEach(function(listItem) {
-        //     console.log()
-        //     self.getDetails(listItem.place_id, listItem);
-        // });
-
-        // self.setCurrentPlace(self.placeList()[5]);        
-        // console.log(service.nearbySearch.radius);
     };
 
     // Create Marker object and set properties
     function createMarker(place) {
         var placeLoc = place.geometry.location;
         var marker = new google.maps.Marker({
-            // map: map,
+            map: null,
             position: place.geometry.location,
             animation: google.maps.Animation.DROP,
             id: place.place_id,
@@ -191,8 +144,6 @@ function MapViewModel() {
 
         // Open info window by clicking the Marker
         google.maps.event.addListener(marker, 'click', function() {
-
-            // infowindow.setContent(place.name);
             setInfoContent(marker, infowindow);
             infowindow.open(map, this);
         });
@@ -208,7 +159,7 @@ function MapViewModel() {
         infowindow.setContent('<div><h3>' + marker.name + '</h3><p>' + marker.vicinity + '</p></div>');
     }
 
-    function showListings() {
+    self.showListings = function() {
         var bounds = new google.maps.LatLngBounds();
         // Extend the boundaries of the map for each marker and display the marker
         for (var i = 0; i < markers.length; i++) {
@@ -216,13 +167,17 @@ function MapViewModel() {
             bounds.extend(markers[i].position);
         }
         map.fitBounds(bounds);
+        
+        self.enableButton(false);
     }
 
     // This function will loop through the listings and hide them all.
-    function hideListings() {
+    self.hideListings = function() {
         for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(null);
         }
+
+        self.enableButton(true);
     }
 
     // function makeMarkerIcon(markerColor) {
@@ -244,21 +199,14 @@ function MapViewModel() {
     // 	})
     // }
 
-    // var listItem = document.getElementById('list-item');
-    // listItem.addEventListener('click', animateMarker());
-
-    // console.log(markers);
-    // $(window).load(function() {
-    // 	initMap();
-    // });
-
-    document.getElementById('show-listings').addEventListener('click', showListings);
-    document.getElementById('hide-listings').addEventListener('click', hideListings);
+    // showListingsBtn.addEventListener('click', showListings);
+    // hideListingsBtn.addEventListener('click', hideListings);
 }
 
 
 /*Function to load the map and markers*/
 function initMap() {
+    "use strict";
 
     // Save center data into variable and create new map object
     map = new google.maps.Map(document.getElementById('map'), {

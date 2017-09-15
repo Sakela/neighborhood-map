@@ -10,50 +10,115 @@ html,body {
 }
 
 #search-box {
-    background: #000000;
-    position: absolute;
+    display: none;
     z-index: 1;
-    width: 20%;
-    height: 400px;
-    opacity: 0.4;
-    filter: alpha(opacity=90);
+    background-color: #8E4E81;
+    position: relative;
+    width: 100%;
+    height: 30px;
     color: #FFFFFF;
-    left:80%;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+#search-name {
+    position: absolute;
+    font-size: 13px;
+    width: 40%;
+    padding: 5px;
+    margin-top: 6px;
+    margin-left: 20px;
+}
+
+.search-btn {
+    width: 100%;
+    background-color: #8E4E81;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.search-image-btn {
+    padding: 5px;
+    margin-top: 2px;
+    margin-left: 10px;
+    height: 25px;
+    width: 25px;
+}
+
+#search-toggle-btn {
+    float: right;
+    height: 40px;
+    width: 40px;
 }
 
 #hide-listings,
 #show-listings {
-  width: 49%;
+    width: 49%;
+    background-color: #FFFFFF;
 }
 
 .list {
-    font-size: 12px;
-    font-weight: 300;
-    margin-left: 12px;
+    display: none;
+    z-index: 1;
+    position: absolute;
+    background: #8E4E81;
+    background: -webkit-linear-gradient(#8E4E81, #000000); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(#8E4E81, #000000); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(#8E4E81, #000000); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(#8E4E81, #000000); /* Standard syntax */
+    font-size: 10px;
+    margin-top: 55px;
     padding: 0;
     overflow: auto;
-    height: 75%;
+    height: 60%;
+    width: 120px;
+}
+
+.list-item {
+    list-style-type: none;
+    color: #FFFFFF;
+}
+
+.list-block {
+    padding: 5px;
+}
+
+.list-item-name {
+    font-family: sans-serif;    
+    display: inline;
+    position: relative;
+}
+
+.list-item-rating {
+    margin-left: 25px;
+}
+
+.list-item-vicinity {
+    font-family: cursive;
+    color: #fdebfd;
 }
 
 .detailed-info {
-    background: #FFFFFF;
+    background: #8E4E81;
+    background: -webkit-linear-gradient(#8E4E81, #000000); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(#8E4E81, #000000); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(#8E4E81, #000000); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(#8E4E81, #000000); /* Standard syntax */
     position: absolute;
     z-index: 1;
-    width: 0%;
-    height: 400px;
-    /*opacity: 0.4;
-    filter: alpha(opacity=90);*/
-    transition-timing-function: ease;
-    transition: width 1s;
-    color: #000000;
-    top: 20%;
-    left: 0%;
+    width: 100%;
+    height: 20%;
+    padding: 10px;    
+    color: #FFFFFF;
+    margin-top: 55px;
+    bottom: 0%;
     overflow: auto;
+    font-size: 10px;
 }
 
-.detailed-info.clicked {
+/*.detailed-info.clicked {
     width: 20%;
-}
+}*/
 
 .details-gallery {
     max-width: 70px;
@@ -63,9 +128,9 @@ html,body {
 }
 
 .close-icon {
-    position: relative;
+    position: absolute;
     display: inline;
     max-width: 30px;
     max-height: 30px;
-    margin-left: 90%;
+    margin-left: 85%;
 }
