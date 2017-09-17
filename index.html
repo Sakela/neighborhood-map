@@ -7,11 +7,11 @@
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class="search-btn">
+    <header class="search-btn">
+        <div >
             <img class="search-image-btn" src="img/marker-on.svg" data-bind="click: showListings, enable: enableButton">
             <img class="search-image-btn" src="img/marker-off.svg" data-bind="click: hideListings, disable: enableButton">
-            <input id="search-name" type="text" placeholder="Search By Name">
+            <input id="search-name" placeholder="Search By Name" data-bind="textInput: searchText, ">
             <img id="search-toggle-btn" src="img/menu.png" data-bind="click: $root.toggleList">
         </div>
     </header>
@@ -21,7 +21,7 @@
         <!-- <a href="https://api.instagram.com/oauth/authorize/?client_id=2684bb532a1f4ad39bbe9d6a8a27b5c5&redirect_uri=https://sakela.github.io/neighborhood-map/&response_type=token">Enter Instagram</a> -->        
 
     <div class="list">
-        <ul class="list-block" data-bind="foreach: placeList">
+        <ul class="list-block" data-bind="foreach: searchResults">
             <li class="list-item" data-bind="click: $root.bindPlaceMarker">
                 <h3 class="list-item-name" data-bind="text: name"></h3>
                 <!-- <span class="list-item-rating" data-bind="text: rating"></span> -->
@@ -39,15 +39,17 @@
             <p data-bind="text: vicinity"></p>
             <span data-bind="text: phoneNumber"></span>
             <hr>
-            <div data-bind="foreach: images">
-                <img class="details-gallery" src="" data-bind="attr: {src: $data.getUrl({'maxWidth': 200, 'maxHeight': 200})}">
-            </div>
-            <a data-bind="attr: { href: website }, text: website"></a>
-            <button data-bind="click: toggleReviews">Toggle Reviews</button>
-            <div data-bind="foreach: reviews, visible: showReviews">
-                <h4 data-bind="text: author_name"></h4>
-                <span data-bind="text: rating"></span>
-                <p data-bind="text: text"></p>
+            <div class="slide-out">
+                <div data-bind="foreach: images">
+                    <img class="details-gallery" src="" data-bind="attr: {src: $data.getUrl({'maxWidth': 200, 'maxHeight': 200})}">
+                </div>
+                <a data-bind="attr: { href: website }, text: website"></a>
+                <button data-bind="click: toggleReviews">Toggle Reviews</button>
+                <div data-bind="foreach: reviews, visible: showReviews">
+                    <h4 data-bind="text: author_name"></h4>
+                    <span data-bind="text: rating"></span>
+                    <p data-bind="text: text"></p>
+                </div>
             </div>
         </div>
     </div>

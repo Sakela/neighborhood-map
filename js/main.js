@@ -51,7 +51,13 @@ var MapViewModel = function() {
     self.placeList = ko.observableArray([]);
     self.currentPlace = ko.observable();
     self.enableButton = ko.observable(true);
+    self.searchText = ko.observable('');
+    
     // self.isVisibleDetails = ko.observable(false);
+
+    // if(self.searchText().length > 0) {
+    //     console.log(self.searchText());
+    // }
 
     self.toggleList = function() {
         $('.list').toggle(100);
@@ -61,6 +67,35 @@ var MapViewModel = function() {
     self.setCurrentPlace = function(place) {
         self.currentPlace(place);
     }
+
+    self.searchResults = ko.computed(function() {
+        var matches = [];
+        // Create a regular expression for performing a case-insensitive
+        // search using the current value of the filter observable
+        var re = new RegExp(self.searchText(), 'i');
+
+        // Iterate over all stations objects, searching for a matching name
+        self.placeList().forEach(function(place) {
+            // If it's a match, save it to the list of matches and show its
+            // corresponding map marker
+            if (place.name().search(re) !== -1) {
+                matches.push(place);
+                // place.mapMarker.setVisible(true);
+            // Otherwise, ensure the corresponding map marker is hidden
+            } else {
+                // Hide marker
+                // place.mapMarker.setVisible(false);
+
+                // If this station is active (info window is open), then
+                // deactivate it
+                // if (SubwayStation.prototype.active === station) {
+                //     station.deactivate();
+                // }
+            }
+        });
+
+        return matches;
+    });
 
     //Google Places request to get more detailed info for locations and create Model and Markers
     self.getDetails = function(id, currentPlace) {
@@ -72,7 +107,7 @@ var MapViewModel = function() {
                 //Push locations from the list into Model and call function to create Markers
                 self.placeList.push(new ListItem(place));
                 createMarker(place);
-                console.log(place);
+                // console.log(place);
             }         
         });
     }
@@ -201,6 +236,9 @@ var MapViewModel = function() {
 
     // showListingsBtn.addEventListener('click', showListings);
     // hideListingsBtn.addEventListener('click', hideListings);
+    $('#details').bind('touchstart', function() {
+        $('.slide-out').toggle();
+    })
 }
 
 
