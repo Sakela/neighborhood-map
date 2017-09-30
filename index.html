@@ -7,56 +7,59 @@
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-    <header class="search-btn">
-        <div >
-            <img class="search-image-btn" src="img/marker-on.svg" data-bind="click: showListings, enable: enableButton">
-            <img class="search-image-btn" src="img/marker-off.svg" data-bind="click: hideListings, disable: enableButton">
-            <input id="search-name" placeholder="Search By Name" data-bind="textInput: searchText, ">
-            <img id="search-toggle-btn" src="img/menu.png" data-bind="click: $root.toggleList">
-        </div>
-    </header>
-    
 
-    
-        <!-- <a href="https://api.instagram.com/oauth/authorize/?client_id=2684bb532a1f4ad39bbe9d6a8a27b5c5&redirect_uri=https://sakela.github.io/neighborhood-map/&response_type=token">Enter Instagram</a> -->        
+    <header class="menu">
+        <div>
+            <img class="menu-marker-btn" src="img/marker-on.svg" data-bind="click: showListings, enable: enableButton">
+            <img class="menu-marker-btn" src="img/marker-off.svg" data-bind="click: hideListings, disable: enableButton">
+            <!-- <input id="menu-filter" placeholder="Search By Name" data-bind="textInput: searchText">
+            <input id="menu-filter" placeholder="Search By Name" data-bind="textInput: searchText"> -->
+            <img id="menu-toggle-list" src="img/menu.png" data-bind="click: $root.toggleList">
+        </div>
+    </header>      
 
     <div class="list">
+        <input id="list-filter" placeholder="Filter Results" data-bind="textInput: searchText">
         <ul class="list-block" data-bind="foreach: searchResults">
             <li class="list-item" data-bind="click: $root.bindPlaceMarker">
                 <h3 class="list-item-name" data-bind="text: name"></h3>
-                <!-- <span class="list-item-rating" data-bind="text: rating"></span> -->
-                <p class="list-item-vicinity" data-bind="text: vicinity"></p>
+                <p class="list-item-vicinity" data-bind="text: formattedAddress"></p>
             </li>
             <hr>
         </ul>
-    </div>
-
-    <div id="details" data-bind="with: currentPlace">
-
-        <div class="detailed-info" data-bind="visible: isVisibleDetails">
-            <img class="close-icon" src='img/close-icon.png' data-bind="click: toggleVisibility">
-            <h3 data-bind="text: name"></h3>
-            <p data-bind="text: vicinity"></p>
-            <span data-bind="text: phoneNumber"></span>
-            <hr>
-            <div class="slide-out">
-                <div data-bind="foreach: images">
-                    <img class="details-gallery" src="" data-bind="attr: {src: $data.getUrl({'maxWidth': 200, 'maxHeight': 200})}">
-                </div>
-                <a data-bind="attr: { href: website }, text: website"></a>
-                <button data-bind="click: toggleReviews">Toggle Reviews</button>
-                <div data-bind="foreach: reviews, visible: showReviews">
-                    <h4 data-bind="text: author_name"></h4>
-                    <span data-bind="text: rating"></span>
-                    <p data-bind="text: text"></p>
-                </div>
-            </div>
-        </div>
-    </div>
+    </div>    
 
     <div id="map"></div>
 
-    
+    <div class="footer">
+        <h4 class="footer-title inline">Neighborhood Map</h4>
+        <div class="footer-weather right">
+            <img src="http://openweathermap.org/img/w/10d.png">
+            <div class="inline" data-bind="text: $root.currentWeather"></div>
+            <span>°</span>
+        </div>
+
+        <div id="details" data-bind="with: currentPlace">
+            <div class="details-info" data-bind="visible: isVisibleDetails">
+                <img class="details-close-icon" src='img/close-icon.png' data-bind="click: toggleVisibility">
+                <h3 data-bind="text: name"></h3>
+                <p data-bind="text: vicinity"></p>
+                <span data-bind="text: phoneNumber"></span>
+                <hr>
+                
+                <div data-bind="foreach: images">
+                    <img class="details-gallery-image" src="" data-bind="attr: {src: $data.getUrl({'maxWidth': 200, 'maxHeight': 200})}">
+                </div>
+                <a data-bind="attr: { href: website }, text: website"></a>
+                <button data-bind="click: toggleReviews">Toggle Reviews</button>
+                <div class="details-reviews" data-bind="foreach: reviews, visible: showReviews">
+                    <h4 data-bind="text: author_name"></h4>
+                    <span data-bind="text: rating"></span>
+                    <p data-bind="text: text"></p>
+                </div>                
+            </div>
+        </div>
+    </div> 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script src="js/libs/jquery.min.js"></script>
