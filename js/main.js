@@ -5,41 +5,16 @@ var map;
 var ListItem = function(data) {
     "use strict";
 
-    // this.name = ko.observable(data.name);
-    // this.id = ko.observable(data.place_id);
-    // this.vicinity = ko.observable(data.vicinity);
-    // this.rating = ko.observable(data.rating);
-    // this.phoneNumber = ko.observable(data.international_phone_number);
-    // this.images = ko.observableArray(data.photos);
-    // this.website = ko.observable(data.website);
-    // this.reviews = ko.observableArray(data.reviews);
-
     this.id = ko.observable(data.venue.id);
-    this.name = ko.observable(data.venue.name);
-    this.lat = ko.observable(data.venue.location.lat);
-    this.lon = ko.observable(data.venue.location.lng);
+    this.name = ko.observable(data.venue.name.toUpperCase());
+    this.phoneNumber = ko.observable(data.venue.contact.phone);
+    this.address = ko.observable(data.venue.location.address);
     this.formattedAddress = ko.observable(data.venue.location.formattedAddress);
     this.categories = ko.observable(data.venue.categories[0].name);
-    // this.foursquareUrl = "https://foursquare.com/v/" + this.id;
-    // this.photoAlbumn = [];
-    // this.marker = {};
-    // this.photoPrefix = 'https://irs0.4sqi.net/img/general/';
-    // this.photoPlaceHolder = 'http://placehold.it/100x100';
-    // this.photoSuffix;
-    // this.basePhotoAlbumnURL = 'https://api.foursquare.com/v2/venues/';
-
-    // // data that may be undefined or need formatting
-    // this.photoAlbumnURL = this.getPhotoAlbumnURL(data, foursquareID);
-
-    // this.formattedPhone = this.getFormattedPhone(data);
-
-    // this.tips = this.getTips(data);
-
-    // this.url = this.getUrl(data);
-
-    // this.rating = this.getRating(data);
-
-    // this.featuredPhoto = this.getFeaturedPhoto(data);
+    this.rating = ko.observable(data.venue.rating);
+    this.url = ko.observable(data.venue.url);
+    this.image = ko.observable(data.venue.photos);
+    this.firstImage = ko.observable();
 
     this.showReviews = ko.observable(false);
 
@@ -75,23 +50,42 @@ var MapViewModel = function() {
         parks = [],
         markers = [],
         showListingsBtn = document.getElementById('show-listings'),
-        hideListingsBtn = document.getElementById('hide-listings');
+        hideListingsBtn = document.getElementById('hide-listings'),
+        defaultCity = 'Atlanta',
+        defaultIcon = makeMarkerIcon('8E4E81');
 
     self.placeList = ko.observableArray([]);
     self.currentPlace = ko.observable();
     self.enableButton = ko.observable(true);
     self.searchText = ko.observable('');
     self.currentWeather = ko.observable();
-    
-    // self.isVisibleDetails = ko.observable(false);
+    self.cityInput = ko.observable(defaultCity);
 
-    // if(self.searchText().length > 0) {
-    //     console.log(self.searchText());
-    // }
-
-    // Show/hide the list of locations
+    // Show/hide the list of locations for mobile screens
     self.toggleList = function() {
-        $('.list').toggle(100);
+        var list = $(".list");
+
+        if (list.css('display') == 'none') {
+            $('.list').toggle(100);
+            $("#map").css({"height": "40%"});
+            $(".footer").css({"display" : "none"});
+            $(".list").css({"height" : "53%"});            
+        } else {
+            if (window.innerWidth < 400) {
+                $('.list').toggle(100);
+                $("#map").css({"height": "85%"});
+                $(".footer").css({"display" : "inline-block"});
+            } else {
+                $('.list').toggle(100);
+                $("#map").css({"height": "76%"});
+                $(".footer").css({"display" : "inline-block"});
+            };
+        }
+        
+    }
+
+    self.clearFilter = function() {
+        self.searchText('');
     }
 
     //Handles chosen list item and saves into ViewModel obesrvable property
@@ -131,129 +125,145 @@ var MapViewModel = function() {
     });
 
     //Google Places request to get more detailed info for locations and create Model and Markers
-    self.getDetails = function(id, currentPlace) {
-        // service.getDetails({
-        //     placeId: id
-        // }, function(place, status) {
-        //     if (status === google.maps.places.PlacesServiceStatus.OK) {
-                
-        //         //Push locations from the list into Model and call function to create Markers
-        //         self.placeList.push(new ListItem(place));
-        //         createMarker(place);
-        //         // console.log(place);
-        //     }         
-        // });
+    self.getDetails = function(cityObj) {       
 
-        var venues = [];
+        
+
+        console.log(cityObj.lat)
 
         $.ajax({
-            url: 'https://api.foursquare.com/v2/venues/explore?ll=39.4730591,-0.3689012&query=park&client_id=RG0BDGPCIXRYCKU3MGO2K4NSMZQMEZG3PVX1IEQQ1W5V5OMF&client_secret=1OVPLSTAD3E0PNUHRMZVSFC24NJS0YATRZSTZ0BCWGPU5AKU&v=20170919',
+            url: 'https://api.foursquare.com/v2/venues/explore?ll=' + cityObj.lat + ',' + cityObj.lng + '&client_id=RG0BDGPCIXRYCKU3MGO2K4NSMZQMEZG3PVX1IEQQ1W5V5OMF&client_secret=1OVPLSTAD3E0PNUHRMZVSFC24NJS0YATRZSTZ0BCWGPU5AKU&v=20170919&venuePhotos=1',
             success: function(data) {
-                // console.log(data);
-                venues = data.response.groups[0].items;
-                console.log(venues);
+                console.log(data);
+                var array = [];
+                array = data.response.groups[0].items;
+                // console.log(items);
 
-                venues.forEach(function(venue) {
-                    self.placeList.push(new ListItem(venue));
-                    createMarker(venue);
+                array.forEach(function(item) {
+                    // var imgItems = item.venue.photos.groups[0];
+                    // console.log(imgItems);
+                    // var venueImgURL = 'https://irs3.4sqi.net/img/general/width100' + imgItems;
+                    console.log(item);
+                    
+                    createMarker(item);
+                    getPhotos(item);
+                    // self.placeList.push(new ListItem(item));
                 });
 
-                // console.log(self.placeList());
+                console.log(self.placeList());
             }
         });
+    };
 
-        // venueId.forEach(function(uniqueId) {
-        //     $.ajax({
-        //         url: 'https://api.foursquare.com/v2/venues/uniqueId&client_id=RG0BDGPCIXRYCKU3MGO2K4NSMZQMEZG3PVX1IEQQ1W5V5OMF&client_secret=1OVPLSTAD3E0PNUHRMZVSFC24NJS0YATRZSTZ0BCWGPU5AKU&v=20170919',
-        //         success: function(data) {
-        //             console.log(data);
-        //         }
-        //     });
-        // });
 
-    }();
 
+    function searchCity(city) {
+
+        var request = {
+            query: city
+        };
+
+        console.log(city);
+
+        service.textSearch(request, function(data, status) {
+            if (status != google.maps.places.PlacesServiceStatus.OK) {
+                console.log("ERROR RETRIEVING CITY")
+                return;
+            }
+
+            if (status == google.maps.places.PlacesServiceStatus.OK) {
+                var cityObj = {};
+             
+                cityObj.lat = data[0].geometry.location.lat();
+                cityObj.lng = data[0].geometry.location.lng();
+
+                var newCity = new google.maps.LatLng(data[0].geometry.location.lat(), data[0].geometry.location.lng());
+                
+                map.setCenter(newCity);
+                self.getDetails(cityObj);
+            }
+        });
+    }
+    searchCity(self.cityInput());
+
+    $('#menu-city-search').change(function() {
+        self.hideListings();
+        markers.length = 0;
+        self.placeList().length = 0;
+
+        var inputValue = $('#menu-city-search').val();
+        self.cityInput(inputValue);
+        console.log('change made ' + self.cityInput());
+        
+        searchCity(self.cityInput());
+
+    });
+
+    //Binds display of the location from the list and the marker on the map
     self.bindPlaceMarker = function(currentPlace) {
         // self.getDetails(currentPlace.id(), currentPlace);
         self.setCurrentPlace(currentPlace);
-        self.toggleList();
+        if (window.innerWidth < 400) {
+            self.toggleList();
+        }
 
+        self.searchText(currentPlace.name());        
+
+        console.log(currentPlace);
+
+        //Matches clicked location's ID with the ID of one of the markers and opens info for correct marker
         markers.forEach(function(marker) {
-
-            if (currentPlace.id() === marker.id) {
-                
+            if (currentPlace.id() === marker.id) {                
                 if(marker.map !== null) {
-
                     setInfoContent(marker, infowindow);
                     infowindow.open(map, marker);
                     marker.setAnimation(google.maps.Animation.DROP);
                     map.panTo(marker.position);  
                 }                             
-                // console.log(currentPlace);
             }
         });
-        $("#map").css({"height": "50%"});
-        $(".footer").css({"height" : "43%"});
 
-        this.toggleVisibility();
+        // $("#map").css({"height": "50%"});
+        // $(".footer").css({"height": "43%"});
+
+        // this.toggleVisibility();
     }   
 
-    // service.nearbySearch({
-    //     location: {
-    //         lat: 39.4730591,
-    //         lng: -0.3689012
-    //     },
-    //     radius: 1000,
-    //     type: ['lodging']
-    // }, callback);
-
-    
-
-    
-
-    // Callback function that iterates through Places response, 
-    // pushes each data into Model, and creates Markers on the map
-    // function callback(results, status) {
-    //     if (status === google.maps.places.PlacesServiceStatus.OK) {
-
-    //         var resultsLength = results.length;
-
-    //         for (var i = 0; i < resultsLength; i++) {
-    //             var result = results[i];
-
-    //             self.getDetails(result.place_id, result);
-    //         }
-            
-    //     }
-    // };
-
     // Create Marker object and set properties
-    function createMarker(venue) {
-        // var placeLoc = place.geometry.location;
-        var venuePosition = new google.maps.LatLng(venue.location.lat(), venue.location.lon());
+    function createMarker(item) {
+        var venuePosition = new google.maps.LatLng(item.venue.location.lat, item.venue.location.lng);
 
-        console.log(venuePosition);
+        var marker = new google.maps.Marker({
+            map: null,
+            position: venuePosition,
+            animation: google.maps.Animation.DROP,
+            icon: defaultIcon,
+            name: item.venue.name,
+            id: item.venue.id,
+            vicinity: item.venue.location.address
+        });
 
-        // var marker = new google.maps.Marker({
-        //     map: null,
-        //     position: venuePosition,
-        //     animation: google.maps.Animation.DROP,
-        //     // id: place.place_id,
-        //     name: venue.name,
-        //     // vicinity: place.vicinity,
-        //     // img : place.photos[0].getUrl({'maxWidth': 200, 'maxHeight': 200})
-        // });
+        // Open info window by clicking the Marker
+        google.maps.event.addListener(marker, 'click', function() {
+            setInfoContent(marker, infowindow);
+            infowindow.open(map, this);
+            self.searchText(this.name);
+            // $('#list-filter').val(this.name);
+        });
 
-        // // Open info window by clicking the Marker
-        // google.maps.event.addListener(marker, 'click', function() {
-        //     setInfoContent(marker, infowindow);
-        //     infowindow.open(map, this);
-        // });
+        markers.push(marker);
+        self.showListings();
+    }
 
-        // markers.push(marker);
-
-        // marker.setMap(null);
-
+    function makeMarkerIcon(markerColor) {
+        var markerImage = new google.maps.MarkerImage(
+            'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+            '|40|_|%E2%80%A2',
+            new google.maps.Size(21, 34),
+            new google.maps.Point(0, 0),
+            new google.maps.Point(10, 34),
+            new google.maps.Size(21,34));
+        return markerImage;
     }
 
     function setInfoContent(marker, infowindow) {
@@ -266,6 +276,7 @@ var MapViewModel = function() {
         // Extend the boundaries of the map for each marker and display the marker
         for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(map);
+            infowindow.close(map, this);
             bounds.extend(markers[i].position);
         }
         map.fitBounds(bounds);
@@ -309,50 +320,29 @@ var MapViewModel = function() {
                 self.currentWeather(data.main.temp);
             }
         })
-    }();
+    }();    
 
-    // var venuesArray = [];
-    // var firstVenue;
+    function getPhotos(item) {
+        var baseImgURL = 'https://irs3.4sqi.net/img/general/'; // base url to retrieve venue photos
 
-    // $.ajax({
-    //         url: 'https://api.foursquare.com/v2/venues/search?ll=39.4730591,-0.3689012&query=park&client_id=RG0BDGPCIXRYCKU3MGO2K4NSMZQMEZG3PVX1IEQQ1W5V5OMF&client_secret=1OVPLSTAD3E0PNUHRMZVSFC24NJS0YATRZSTZ0BCWGPU5AKU&v=20170919',
-    //         success: function(data) {
-    //             // console.log(data);
-    //             var venues = data.response.venues;
-    //             console.log(venues);
+        $.ajax({
+            url: 'https://api.foursquare.com/v2/venues/' + item.venue.id + '/photos?limit=1&client_id=RG0BDGPCIXRYCKU3MGO2K4NSMZQMEZG3PVX1IEQQ1W5V5OMF&client_secret=1OVPLSTAD3E0PNUHRMZVSFC24NJS0YATRZSTZ0BCWGPU5AKU&v=20130815',
+            dataType: 'jsonp',
+            success: function(data) {
+                // console.log(data);
 
-    //             venues.forEach(function(venue) {
-    //                 firstVenue = venues[0];
-    //                 venuesArray.push(venues);
-    //                 // self.placeList.push(new ListItem(venue));
-    //                 // createMarker(venue);
-    //             });
-    //         }
-    //     });
+                var imgItems = data.response.photos.items[0].suffix;
+                var venueImgURL = 'https://irs3.4sqi.net/img/general/width100' + imgItems;
+                
+                item.venue.photos = venueImgURL;
 
-    // // var baseImgURL = 'https://irs3.4sqi.net/img/general/'; // base url to retrieve venue photos
+                console.log(item);
 
-    //     $.ajax({
-    //         url: 'https://api.foursquare.com/v2/venues/4b770f6ef964a52024792ee3/photos?client_id=RG0BDGPCIXRYCKU3MGO2K4NSMZQMEZG3PVX1IEQQ1W5V5OMF&client_secret=1OVPLSTAD3E0PNUHRMZVSFC24NJS0YATRZSTZ0BCWGPU5AKU&v=20130815',
-    //         dataType: 'jsonp',
-    //         success: function(data) {
-    //             // console.log(data);
-
-    //             var imgItems = data.response.photos.items;
-    //             console.log(imgItems);
-
-    //             // set venu photo data in venue photo albumn
-    //             // for (var i in imgItems) {
-    //             //     var venueImgURL = baseImgURL + 'width800' + imgItems[i].suffix;
-    //             //     var venueImgObj = {
-    //             //         href: venueImgURL,
-    //             //         title: venueItem.name
-    //             //     };
-    //             //     // push venue photo data object to venue photo albumn
-    //             //     venueItem.photoAlbumn.push(venueImgObj);
-    //             // }
-    //         }
-    //     });
+                self.placeList.push(new ListItem(item));
+            }
+        });
+    }
+        
 }
 
 
@@ -363,8 +353,8 @@ function initMap() {
     // Save center data into variable and create new map object
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
-            lat: 39.4730591,
-            lng: -0.3689012
+            lat: 33.7489954,
+            lng: -84.3879824
         },
         zoom: 13
     });

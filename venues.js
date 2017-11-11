@@ -5,3 +5,43 @@ $.ajax({
 		console.log(data);
 	}
 });
+
+
+// service.getDetails({
+        //     placeId: id
+        // }, function(place, status) {
+        //     if (status === google.maps.places.PlacesServiceStatus.OK) {
+                
+        //         //Push locations from the list into Model and call function to create Markers
+        //         self.placeList.push(new ListItem(place));
+        //         createMarker(place);
+        //         // console.log(place);
+        //     }         
+        // });
+
+
+        // service.nearbySearch({
+    //     location: {
+    //         lat: 39.4730591,
+    //         lng: -0.3689012
+    //     },
+    //     radius: 1000,
+    //     type: ['lodging']
+    // }, callback);
+
+
+     // Callback function that iterates through Places response, 
+    // pushes each data into Model, and creates Markers on the map
+    // function callback(results, status) {
+    //     if (status === google.maps.places.PlacesServiceStatus.OK) {
+
+    //         var resultsLength = results.length;
+
+    //         for (var i = 0; i < resultsLength; i++) {
+    //             var result = results[i];
+
+    //             self.getDetails(result.place_id, result);
+    //         }
+            
+    //     }
+    // };
