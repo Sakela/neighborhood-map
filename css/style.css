@@ -151,6 +151,7 @@ html,body {
     display: inline-block;
     color: #FFFFFF;
     padding: 5px;
+    width: 100%;
 }
 
 .list-block {
@@ -174,11 +175,15 @@ html,body {
     color: #8E4E81;
     border-radius: 5px;
     font-weight: 900;
+    width: 25px;
+    text-align: center;
 }
 
 .list-item-image {
+    display: block;
+    margin: auto;
     max-height: 100px;
-    max-width: 100px;
+    max-width: 80px;
 }
 
 .list-item-vicinity {
@@ -242,6 +247,13 @@ html,body {
     height: 8%;
     width: 100%;
     background-color: #8E4E81;
+    text-align: center;
+}
+
+.footer-title {
+    line-height: 50px;
+    font-size: 20px;
+    font-family: serif;
 }
 
 /*** GENERAL ***/
@@ -266,7 +278,6 @@ html,body {
 .right-side {
     width: 25%;
     float: left;
-    /*margin-right: 10px;*/
 }
 
 .right {
@@ -298,13 +309,22 @@ html,body {
     .list {
         height: 48%;
     }
+
+    .list-item-image {
+        max-width: 100px;
+        max-height: 100px;
+    }
+
+    .right-side {
+        float: right;
+    }
 }
 
 @media only screen and (min-width: 765px) {
     #map {
         display: inline-block;
-        height: 80%;
-        width: 75%;
+        height: 93%;
+        width: 70%;
     }
 
     .list {
@@ -318,14 +338,15 @@ html,body {
         font-size: 15px;
         margin: 0;
         padding: 0;
-        overflow: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
         height: 100%;
-        width: 25%;
+        width: 30%;
     }
 
     .menu {
-        height: 10%;
-        width: 75%;
+        height: 3%;
+        width: 70%;
         background-color: #8E4E81;
         display: inline-block;
         vertical-align: middle;
@@ -336,12 +357,28 @@ html,body {
     }
 
     .footer {
-        height: 10%;
-        width: 75%;
-        background-color: #8E4E81;
+        height: 4%;
+        width: 70%;
     }
 }
 
 @media only screen and (min-width: 1200px) {
+    #map {
+        display: inline-block;
+        height: 88%;
+        width: 70%;
+    }
 
+    .menu {
+        height: 6%;
+        width: 70%;
+        background-color: #8E4E81;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .footer {
+        height: 6%;
+        width: 70%;
+    }
 } 

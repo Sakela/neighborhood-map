@@ -143,7 +143,7 @@ var MapViewModel = function() {
                     // var imgItems = item.venue.photos.groups[0];
                     // console.log(imgItems);
                     // var venueImgURL = 'https://irs3.4sqi.net/img/general/width100' + imgItems;
-                    console.log(item);
+                    // console.log(item);
                     
                     createMarker(item);
                     getPhotos(item);
