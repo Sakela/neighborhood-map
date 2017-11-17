@@ -246,7 +246,7 @@ html,body {
 .footer {
     height: 8%;
     width: 100%;
-    background-color: #8E4E81;
+    background: #8E4E81; /* For browsers that do not support gradients */
     text-align: center;
 }
 
@@ -322,8 +322,8 @@ html,body {
 
 @media only screen and (min-width: 765px) {
     #map {
-        display: inline-block;
-        height: 93%;
+        /*display: inline-block;*/
+        height: 90%;
         width: 70%;
     }
 
@@ -345,7 +345,7 @@ html,body {
     }
 
     .menu {
-        height: 3%;
+        height: 5%;
         width: 70%;
         background-color: #8E4E81;
         display: inline-block;
@@ -357,14 +357,20 @@ html,body {
     }
 
     .footer {
-        height: 4%;
+        height: 5%;
         width: 70%;
+        background: #8E4E81; /* For browsers that do not support gradients */
+        background: -webkit-linear-gradient(left, #8E4E81, #000000); /* For Safari 5.1 to 6.0 */
+        background: -o-linear-gradient(right, #8E4E81, #000000); /* For Opera 11.1 to 12.0 */
+        background: -moz-linear-gradient(right, #8E4E81, #000000); /* For Firefox 3.6 to 15 */
+        background: linear-gradient(to right, #8E4E81, #000000); /* Standard syntax */
+        text-align: left;
+        padding-left: 10%;
     }
 }
 
 @media only screen and (min-width: 1200px) {
     #map {
-        display: inline-block;
         height: 88%;
         width: 70%;
     }
@@ -380,5 +386,6 @@ html,body {
     .footer {
         height: 6%;
         width: 70%;
+        
     }
 } 
