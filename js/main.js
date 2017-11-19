@@ -45,7 +45,6 @@ var MapViewModel = function() {
     var self = this,
         infowindow = new google.maps.InfoWindow(),
         service = new google.maps.places.PlacesService(map),
-        bounds = new google.maps.LatLngBounds(),
         list = [],
         parks = [],
         markers = [],
@@ -240,6 +239,7 @@ var MapViewModel = function() {
 
     self.showListings = function() {
         // Extend the boundaries of the map for each marker and display the marker
+        var bounds = new google.maps.LatLngBounds();
         for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(map);
             infowindow.close(map, this);
