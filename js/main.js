@@ -15,7 +15,6 @@ var ListItem = function(data) {
     this.url = ko.observable(data.venue.url);
     this.image = ko.observable(data.venue.photos);
     this.firstImage = ko.observable();
-
     this.showReviews = ko.observable(false);
 
     this.toggleReviews = function() {
@@ -46,6 +45,7 @@ var MapViewModel = function() {
     var self = this,
         infowindow = new google.maps.InfoWindow(),
         service = new google.maps.places.PlacesService(map),
+        bounds = new google.maps.LatLngBounds(),
         list = [],
         parks = [],
         markers = [],
@@ -71,7 +71,7 @@ var MapViewModel = function() {
             $(".footer").css({"display" : "none"});
             $(".list").css({"height" : "53%"});            
         } else {
-            if (window.innerWidth < 400) {
+            if (window.innerWidth < 500) {
                 $('.list').toggle(100);
                 $("#map").css({"height": "85%"});
                 $(".footer").css({"display" : "inline-block"});
@@ -81,7 +81,6 @@ var MapViewModel = function() {
                 $(".footer").css({"display" : "inline-block"});
             };
         }
-        
     }
 
     self.clearFilter = function() {
@@ -107,17 +106,6 @@ var MapViewModel = function() {
             // corresponding map marker
             if (place.name().search(re) !== -1) {
                 matches.push(place);
-                // place.mapMarker.setVisible(true);
-            // Otherwise, ensure the corresponding map marker is hidden
-            } else {
-                // Hide marker
-                // place.mapMarker.setVisible(false);
-
-                // If this station is active (info window is open), then
-                // deactivate it
-                // if (SubwayStation.prototype.active === station) {
-                //     station.deactivate();
-                // }
             }
         });
 
@@ -125,37 +113,25 @@ var MapViewModel = function() {
     });
 
     //Google Places request to get more detailed info for locations and create Model and Markers
-    self.getDetails = function(cityObj) {       
-
-        
-
-        console.log(cityObj.lat)
-
+    self.getDetails = function(cityObj) {
         $.ajax({
             url: 'https://api.foursquare.com/v2/venues/explore?ll=' + cityObj.lat + ',' + cityObj.lng + '&client_id=RG0BDGPCIXRYCKU3MGO2K4NSMZQMEZG3PVX1IEQQ1W5V5OMF&client_secret=1OVPLSTAD3E0PNUHRMZVSFC24NJS0YATRZSTZ0BCWGPU5AKU&v=20170919&venuePhotos=1',
             success: function(data) {
-                console.log(data);
+                $('.error').css("display", "none");
                 var array = [];
                 array = data.response.groups[0].items;
-                // console.log(items);
-
-                array.forEach(function(item) {
-                    // var imgItems = item.venue.photos.groups[0];
-                    // console.log(imgItems);
-                    // var venueImgURL = 'https://irs3.4sqi.net/img/general/width100' + imgItems;
-                    // console.log(item);
-                    
+                array.forEach(function(item) {                    
                     createMarker(item);
                     getPhotos(item);
                     // self.placeList.push(new ListItem(item));
                 });
-
-                console.log(self.placeList());
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // $('.list').append('<h2>Something went wrong :( </h2>\n' + '<h3>'+ textStatus.toUpperCase() +': ' + errorThrown.toUpperCase() + '</h3>');
+                $('.error').css("display", "block");
             }
         });
     };
-
-
 
     function searchCity(city) {
 
@@ -163,15 +139,14 @@ var MapViewModel = function() {
             query: city
         };
 
-        console.log(city);
-
         service.textSearch(request, function(data, status) {
             if (status != google.maps.places.PlacesServiceStatus.OK) {
-                console.log("ERROR RETRIEVING CITY")
+                $('.error-search').css("display", "block");
                 return;
             }
 
             if (status == google.maps.places.PlacesServiceStatus.OK) {
+                $('.error-search').css("display", "none");
                 var cityObj = {};
              
                 cityObj.lat = data[0].geometry.location.lat();
@@ -192,11 +167,8 @@ var MapViewModel = function() {
         self.placeList().length = 0;
 
         var inputValue = $('#menu-city-search').val();
-        self.cityInput(inputValue);
-        console.log('change made ' + self.cityInput());
-        
+        self.cityInput(inputValue);        
         searchCity(self.cityInput());
-
     });
 
     //Binds display of the location from the list and the marker on the map
@@ -222,11 +194,6 @@ var MapViewModel = function() {
                 }                             
             }
         });
-
-        // $("#map").css({"height": "50%"});
-        // $(".footer").css({"height": "43%"});
-
-        // this.toggleVisibility();
     }   
 
     // Create Marker object and set properties
@@ -272,7 +239,6 @@ var MapViewModel = function() {
     }
 
     self.showListings = function() {
-        var bounds = new google.maps.LatLngBounds();
         // Extend the boundaries of the map for each marker and display the marker
         for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(map);
@@ -304,23 +270,10 @@ var MapViewModel = function() {
     //   return markerImage;
     // }
 
-    
-
-    // function animateMarker(place) {
-    // 	self.placeList().forEach(function(place) {
-    // 		console.log("OOps");
-    // 	})
-    // }
-
-    self.getWeather = function() {
-        $.ajax({
-            url: 'http://api.openweathermap.org/data/2.5/weather?lat=39.4730591&lon=-0.3689012&units=metric&APPID=ab60d817c88e85c1566b14067d523a73',
-            success: function(data) {
-                // console.log(data.main.temp);
-                self.currentWeather(data.main.temp);
-            }
-        })
-    }();    
+    $(window).resize(function() {
+        console.log("resized");
+        setTimeout(function(){ self.showListings(); }, 1);
+    });   
 
     function getPhotos(item) {
         var baseImgURL = 'https://irs3.4sqi.net/img/general/'; // base url to retrieve venue photos
@@ -329,27 +282,21 @@ var MapViewModel = function() {
             url: 'https://api.foursquare.com/v2/venues/' + item.venue.id + '/photos?limit=1&client_id=RG0BDGPCIXRYCKU3MGO2K4NSMZQMEZG3PVX1IEQQ1W5V5OMF&client_secret=1OVPLSTAD3E0PNUHRMZVSFC24NJS0YATRZSTZ0BCWGPU5AKU&v=20130815',
             dataType: 'jsonp',
             success: function(data) {
-                // console.log(data);
-
                 var imgItems = data.response.photos.items[0].suffix;
-                var venueImgURL = 'https://irs3.4sqi.net/img/general/width100' + imgItems;
-                
+                var venueImgURL = 'https://irs3.4sqi.net/img/general/width100' + imgItems;                
                 item.venue.photos = venueImgURL;
-
-                console.log(item);
-
                 self.placeList.push(new ListItem(item));
             }
         });
-    }
-        
+    }        
 }
+
+
 
 
 /*Function to load the map and markers*/
 function initMap() {
     "use strict";
-
     // Save center data into variable and create new map object
     map = new google.maps.Map(document.getElementById('map'), {
         center: {

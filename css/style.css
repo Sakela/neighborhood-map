@@ -26,6 +26,7 @@ html,body {
     padding: 5px;
     margin-top: 7px;
     margin-left: 15px;
+    width: 150px;
 }
 
 .menu-toggle-marker {
@@ -182,8 +183,9 @@ html,body {
 .list-item-image {
     display: block;
     margin: auto;
-    max-height: 100px;
-    max-width: 80px;
+    height: 80px;
+    width: 80px;
+    object-fit: fill;
 }
 
 .list-item-vicinity {
@@ -264,6 +266,35 @@ html,body {
    left: -9999px !important;
 }
 
+.error-block {
+    z-index: 1;
+    display: inline;
+    position: absolute;
+    color: #FFFFFF;
+    /* Fallback for web browsers that don't support RGBa */
+    background-color: rgb(0, 0, 0);
+    /* RGBa with 0.6 opacity */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* For IE 5.5 - 7*/
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+    /* For IE 8*/
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+}
+
+.error {
+    display: none;
+    position: relative;
+    margin-left: 40px;
+    margin-top: 60px;
+}
+
+.error-search {
+    display: none;
+    position: relative;
+    margin-left: 40px;
+    margin-top: 60px;
+}
+
 /*#hide-listings,
 #show-listings {
     width: 49%;
@@ -300,6 +331,10 @@ html,body {
 
     .menu {
         height: 12%;
+    }
+
+    #menu-city-search {
+        width: auto;
     }
 
     .footer {
