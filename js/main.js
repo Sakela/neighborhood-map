@@ -1,4 +1,4 @@
-// Create instances for map,infowindow objects and list of locations, and markers
+// Create global instance for map object
 var map;
 
 // Model Class to hold the properties for each list item
@@ -15,27 +15,6 @@ var ListItem = function(data) {
     this.url = ko.observable(data.venue.url);
     this.image = ko.observable(data.venue.photos);
     this.firstImage = ko.observable();
-    this.showReviews = ko.observable(false);
-
-    this.toggleReviews = function() {
-        this.showReviews(true);
-    }
-
-    this.isVisibleDetails = ko.observable(false);
-
-    this.toggleVisibility = function() {
-        var detailsInfoWindow = $('.details-info');
-
-        if (this.isVisibleDetails() !== true) {
-            detailsInfoWindow.toggleClass('clicked');
-            this.isVisibleDetails(true);            
-        } else {
-            detailsInfoWindow.toggleClass('clicked');
-            this.isVisibleDetails(false);
-            $("#map").css({"height": "85%"});
-            $(".footer").css({"height" : "8%"});
-        }
-    }
 }
 
 // ViewModel that holds KO functions
@@ -43,7 +22,7 @@ var MapViewModel = function() {
     "use strict"; 
     
     var self = this,
-        infowindow = new google.maps.InfoWindow(),
+        infowindow = new google.maps.InfoWindow({maxWidth:350}),
         service = new google.maps.places.PlacesService(map),
         list = [],
         parks = [],
@@ -51,7 +30,8 @@ var MapViewModel = function() {
         showListingsBtn = document.getElementById('show-listings'),
         hideListingsBtn = document.getElementById('hide-listings'),
         defaultCity = 'Atlanta',
-        defaultIcon = makeMarkerIcon('8E4E81');
+        defaultIcon = makeMarkerIcon('8E4E81'),
+        highlightedIcon = makeMarkerIcon('fc00b5');
 
     self.placeList = ko.observableArray([]);
     self.currentPlace = ko.observable();
@@ -64,7 +44,7 @@ var MapViewModel = function() {
     self.toggleList = function() {
         var list = $(".list");
 
-        if (list.css('display') == 'none') {
+        if (list.css('display') === 'none') {
             $('.list').toggle(100);
             $("#map").css({"height": "40%"});
             $(".footer").css({"display" : "none"});
@@ -188,7 +168,7 @@ var MapViewModel = function() {
                 if(marker.map !== null) {
                     setInfoContent(marker, infowindow);
                     infowindow.open(map, marker);
-                    marker.setAnimation(google.maps.Animation.DROP);
+                    setHighlightedMarkerIcon(marker);
                     map.panTo(marker.position);  
                 }                             
             }
@@ -211,14 +191,22 @@ var MapViewModel = function() {
 
         // Open info window by clicking the Marker
         google.maps.event.addListener(marker, 'click', function() {
+            setHighlightedMarkerIcon(this);
             setInfoContent(marker, infowindow);
             infowindow.open(map, this);
             self.searchText(this.name);
-            // $('#list-filter').val(this.name);
+            // this.setIcon(highlightedIcon);
         });
 
         markers.push(marker);
         self.showListings();
+    }
+
+    function setHighlightedMarkerIcon(clickedMarker) {
+        markers.forEach(function(marker) {
+            marker.setIcon(defaultIcon);
+        });
+        clickedMarker.setIcon(highlightedIcon);
     }
 
     function makeMarkerIcon(markerColor) {
@@ -234,7 +222,7 @@ var MapViewModel = function() {
 
     function setInfoContent(marker, infowindow) {
         // infowindow.marker = marker;
-        infowindow.setContent('<div><h3>' + marker.name + '</h3><p>' + marker.vicinity + '</p></div>');
+        infowindow.setContent('<div class="info-window"><h3>' + marker.name + '</h3><p>' + marker.vicinity + '</p><a class="info-window-url" href="https://foursquare.com/" target="_blank">Powered By Foursquare <i class="fa fa-foursquare fa-lg" aria-hidden="true"></i></a></div>');
     }
 
     self.showListings = function() {
@@ -259,17 +247,6 @@ var MapViewModel = function() {
         self.enableButton(true);
     }
 
-    // function makeMarkerIcon(markerColor) {
-    //   var markerImage = new google.maps.MarkerImage(
-    //     'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
-    //     '|40|_|%E2%80%A2',
-    //     new google.maps.Size(21, 34),
-    //     new google.maps.Point(0, 0),
-    //     new google.maps.Point(10, 34),
-    //     new google.maps.Size(21,34));
-    //   return markerImage;
-    // }
-
     $(window).resize(function() {
         console.log("resized");
         setTimeout(function(){ self.showListings(); }, 1);
@@ -290,9 +267,6 @@ var MapViewModel = function() {
         });
     }        
 }
-
-
-
 
 /*Function to load the map and markers*/
 function initMap() {

@@ -258,6 +258,17 @@ html,body {
     font-family: serif;
 }
 
+/*** INFO WINDOW ***/
+.info-window {
+    height: 100px;
+    width: 200px;
+}
+
+.info-window-url {
+    text-decoration: none;
+    color: #8E4E81;
+}
+
 /*** GENERAL ***/
 
 .hide {
