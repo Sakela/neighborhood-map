@@ -43,23 +43,7 @@ var MapViewModel = function() {
     // Show/hide the list of locations for mobile screens
     self.toggleList = function() {
         var list = $(".list");
-
-        if (list.css('display') === 'none') {
-            $('.list').toggle(100);
-            $("#map").css({"height": "40%"});
-            $(".footer").css({"display" : "none"});
-            $(".list").css({"height" : "53%"});            
-        } else {
-            if (window.innerWidth < 500) {
-                $('.list').toggle(100);
-                $("#map").css({"height": "85%"});
-                $(".footer").css({"display" : "inline-block"});
-            } else {
-                $('.list').toggle(100);
-                $("#map").css({"height": "76%"});
-                $(".footer").css({"display" : "inline-block"});
-            };
-        }
+        list.toggleClass('hidden');
     }
 
     self.clearFilter = function() {
@@ -101,8 +85,8 @@ var MapViewModel = function() {
                 array = data.response.groups[0].items;
                 array.forEach(function(item) {                    
                     createMarker(item);
-                    getPhotos(item);
-                    // self.placeList.push(new ListItem(item));
+                    // getPhotos(item);
+                    self.placeList.push(new ListItem(item));
                 });
             },
             error: function(jqXHR, textStatus, errorThrown) {

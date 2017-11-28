@@ -7,14 +7,23 @@ html,body {
 }
 
 #map {
-    height: 85%;
+    position: absolute;
+    top: 45px;
+    left: 0px;
+    right: 0px;
+    bottom: 45px;
+    /*height: 85%;*/
 }
 
 /*** MENU ***/
 .menu {
-    height: 7%;
-    /*position: absolute;*/
-    z-index: 1;
+    position: absolute;    
+    top: 0px;
+    left: 0px;
+    right: 0px;    
+    height: 45px;
+    
+    /*z-index: 1;*/
     width: 100%;
     background-color: #8E4E81;
     display: inline-block;
@@ -26,7 +35,7 @@ html,body {
     padding: 5px;
     margin-top: 7px;
     margin-left: 15px;
-    width: 150px;
+    width: 125px;
 }
 
 .menu-toggle-marker {
@@ -84,8 +93,8 @@ html,body {
 /*** LIST ***/
 
 .list {
-    display: none;
-    /*z-index: 1;*/
+    /*display: none;*/
+    z-index: 1;
     position: absolute;
     background: #8E4E81;
     background: -webkit-linear-gradient(#8E4E81, #000000); /* For Safari 5.1 to 6.0 */
@@ -157,7 +166,7 @@ html,body {
 
 .list-block {
     padding: 5px;
-    margin-top: 30px;
+    margin: 0px;
 }
 
 .list-item-name {   
@@ -246,15 +255,18 @@ html,body {
 /*** FOOTER ***/
 
 .footer {
-    height: 8%;
+    position: absolute;    
+    bottom: 0;   
+    height: 45px;
+
     width: 100%;
-    background: #8E4E81; /* For browsers that do not support gradients */
+    background: #8E4E81;
     text-align: center;
 }
 
 .footer-title {
-    line-height: 50px;
-    font-size: 20px;
+    line-height: 45px;
+    font-size: 17px;
     font-family: serif;
 }
 
@@ -270,17 +282,17 @@ html,body {
 }
 
 /*** GENERAL ***/
-
-.hide {
-   position: absolute !important;
-   top: -9999px !important;
-   left: -9999px !important;
+.hidden {
+    visibility: hidden;
 }
 
 .error-block {
     z-index: 1;
     display: inline;
     position: absolute;
+    top: 50%;
+    width: 100%;
+    text-align: center;
     color: #FFFFFF;
     /* Fallback for web browsers that don't support RGBa */
     background-color: rgb(0, 0, 0);
@@ -294,16 +306,10 @@ html,body {
 
 .error {
     display: none;
-    position: relative;
-    margin-left: 40px;
-    margin-top: 60px;
 }
 
 .error-search {
     display: none;
-    position: relative;
-    margin-left: 40px;
-    margin-top: 60px;
 }
 
 /*#hide-listings,
@@ -335,21 +341,35 @@ html,body {
     display: inline;
 }
 
+#foursquare-block {
+    text-align: center;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+#foursquare-block-content {
+    text-decoration: none;
+    font-size: 14px;
+    color: #000;
+}
+
+@media only screen and (min-width: 320px) {
+    #menu-city-search {
+        width: 150px;
+    }
+
+    .footer-title {
+        font-size: 20px;
+    }
+
+    #menu-toggle-list {
+        margin-right: 5px;
+    }
+}
+
 @media only screen and (min-width: 500px) {
-    #map {
-        height: 76%;
-    }
-
-    .menu {
-        height: 12%;
-    }
-
     #menu-city-search {
         width: auto;
-    }
-
-    .footer {
-        height: 12%;
     }
 
     .list {
@@ -368,14 +388,17 @@ html,body {
 
 @media only screen and (min-width: 765px) {
     #map {
-        /*display: inline-block;*/
-        height: 90%;
         width: 70%;
+    }
+
+    .hidden {
+        visibility: visible;
     }
 
     .list {
         display: inline-block;
         position: absolute;
+        right: 0;
         background: #8E4E81;
         background: -webkit-linear-gradient(#8E4E81, #000000); /* For Safari 5.1 to 6.0 */
         background: -o-linear-gradient(#8E4E81, #000000); /* For Opera 11.1 to 12.0 */
@@ -391,7 +414,6 @@ html,body {
     }
 
     .menu {
-        height: 5%;
         width: 70%;
         background-color: #8E4E81;
         display: inline-block;
@@ -403,7 +425,6 @@ html,body {
     }
 
     .footer {
-        height: 5%;
         width: 70%;
         background: #8E4E81; /* For browsers that do not support gradients */
         background: -webkit-linear-gradient(left, #8E4E81, #000000); /* For Safari 5.1 to 6.0 */
@@ -411,18 +432,19 @@ html,body {
         background: -moz-linear-gradient(right, #8E4E81, #000000); /* For Firefox 3.6 to 15 */
         background: linear-gradient(to right, #8E4E81, #000000); /* Standard syntax */
         text-align: left;
-        padding-left: 10%;
+    }
+
+    .footer-title {
+        padding-left: 13%;
     }
 }
 
 @media only screen and (min-width: 1200px) {
     #map {
-        height: 88%;
         width: 70%;
     }
 
     .menu {
-        height: 6%;
         width: 70%;
         background-color: #8E4E81;
         display: inline-block;
@@ -430,8 +452,6 @@ html,body {
     }
 
     .footer {
-        height: 6%;
-        width: 70%;
-        
+        width: 70%;        
     }
 } 

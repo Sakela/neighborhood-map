@@ -18,11 +18,14 @@
             </div>
         </header>      
 
-        <div class="list">
+        <div class="list hidden">
             <div class="list-filter">
                 <i class="fa fa-filter"></i>
                 <i class="fa fa-times" aria-hidden="true" data-bind="click: clearFilter"></i>
                 <input placeholder="Filter By Name" data-bind="textInput: searchText">
+            </div>
+            <div id="foursquare-block">
+                <a id="foursquare-block-content" href="https://foursquare.com/" target="_blank">Powered By Foursquare <i class="fa fa-foursquare fa-lg" aria-hidden="true"></i></a>
             </div>
             <h2 class="error">Error: The list of venues/markers was not generated :( </h2>
             <ul class="list-block" data-bind="foreach: searchResults">
@@ -35,8 +38,8 @@
                             <div class="content" data-bind="if: url"><i class="fa fa-globe" aria-hidden="true"></i><a class="list-item-website content" target="_blank" data-bind="attr: { href: url }, text: url"></a></div>
                         </div>
                         <div class="right-side">
-                            <img class="list-item-image" src="" data-bind="attr: {src: image}">
-                            <!-- <a href="https://placeholder.com"><img src="http://via.placeholder.com/100x100"></a> -->
+                            <!-- <img class="list-item-image" src="" data-bind="attr: {src: image}"> -->
+                            <a href="https://placeholder.com"><img src="http://via.placeholder.com/100x100"></a>
                         </div>              
                     </li>
                     <hr>
