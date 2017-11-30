@@ -40,22 +40,6 @@ var ViewModel = function() {
     self.searchText = ko.observable('');
     self.cityInput = ko.observable(defaultCity);
 
-    // Show/hide the list of venues for mobile screens
-    self.toggleList = function() {
-        var list = $(".list");
-        list.toggleClass('hidden');
-    }
-
-    // Clears input in the Filter of venues
-    self.clearFilter = function() {
-        self.searchText('');
-    }
-
-    //Handles chosen list item and saves into ViewModel current venue obesrvable
-    self.setCurrentPlace = function(place) {
-        self.currentPlace(place);
-    }
-
     // Filter search method for venues in the list
     self.searchResults = ko.computed(function() {
         var matches = [];
@@ -68,9 +52,24 @@ var ViewModel = function() {
                 matches.push(place);
             }
         });
-
         return matches;
     });
+
+    // Show/hide the list of venues for mobile screens
+    self.toggleList = function() {
+        var list = $(".list");
+        list.toggleClass('hidden');
+    };
+
+    // Clears input in the Filter of venues
+    self.clearFilter = function() {
+        self.searchText('');
+    };
+
+    //Handles chosen list item and saves into ViewModel current venue obesrvable
+    self.setCurrentPlace = function(place) {
+        self.currentPlace(place);
+    };    
 
     //Foursquare request for venues within lat longs of the current city passed (This method called in 'searchCity' function)
     self.getDetails = function(cityObj) {
@@ -81,8 +80,8 @@ var ViewModel = function() {
                 array = data.response.groups[0].items;
                 // Iterate over array of pulled venues and create Markers, then fire off request for venues photos
                 array.forEach(function(item) {
-                    createMarker(item);
-                    getPhotos(item);
+                    self.createMarker(item);
+                    self.getPhotos(item);
                     // self.placeList.push(new Venue(item));
                 });
             },
@@ -92,8 +91,22 @@ var ViewModel = function() {
         });
     };
 
+    // Foursquare request for each venue to get photos
+    self.getPhotos = function(item) {
+        $.ajax({
+            url: 'https://api.foursquare.com/v2/venues/' + item.venue.id + '/photos?limit=1&client_id=RG0BDGPCIXRYCKU3MGO2K4NSMZQMEZG3PVX1IEQQ1W5V5OMF&client_secret=1OVPLSTAD3E0PNUHRMZVSFC24NJS0YATRZSTZ0BCWGPU5AKU&v=20130815',
+            dataType: 'jsonp',
+            success: function(data) {
+                var imgItems = data.response.photos.items[0].suffix;
+                var venueImgURL = 'https://irs3.4sqi.net/img/general/width100' + imgItems;
+                item.venue.photos = venueImgURL;
+                self.placeList.push(new Venue(item));
+            }
+        });
+    };
+
     // Google Places request for passed current city name
-    function searchCity(city) {
+    self.searchCity = function(city) {
         var request = {
             query: city
         };
@@ -118,10 +131,10 @@ var ViewModel = function() {
                 self.getDetails(cityObj);
             }
         });
-    }
+    };
 
     // Call city search with current input in City Search field
-    searchCity(self.cityInput());
+    self.searchCity(self.cityInput());
     //On change listener for City Search input, and fire off 'searchCity' function if has new input 
     $('#menu-city-search').change(function() {
         self.hideListings();
@@ -130,7 +143,7 @@ var ViewModel = function() {
 
         var inputValue = $('#menu-city-search').val();
         self.cityInput(inputValue);
-        searchCity(self.cityInput());
+        self.searchCity(self.cityInput());
     });
 
     //Binds display of the location from the list and the marker on the map
@@ -149,15 +162,15 @@ var ViewModel = function() {
                 if (marker.map !== null) {
                     setInfoContent(marker, infowindow);
                     infowindow.open(map, marker);
-                    setHighlightedMarkerIcon(marker);
+                    self.setHighlightedMarkerIcon(marker);
                     map.panTo(marker.position);
                 }
             }
         });
-    }
+    };
 
     // Create Marker object and set properties
-    function createMarker(item) {
+    self.createMarker = function(item) {
         var venuePosition = new google.maps.LatLng(item.venue.location.lat, item.venue.location.lng);
 
         var marker = new google.maps.Marker({
@@ -172,7 +185,7 @@ var ViewModel = function() {
 
         // Open info window by clicking the Marker
         google.maps.event.addListener(marker, 'click', function() {
-            setHighlightedMarkerIcon(this);
+            self.setHighlightedMarkerIcon(this);
             setInfoContent(marker, infowindow);
             infowindow.open(map, this);
             self.searchText(this.name);
@@ -180,31 +193,17 @@ var ViewModel = function() {
 
         markers.push(marker);
         self.showListings();
-    }
+    };
 
-    function setHighlightedMarkerIcon(clickedMarker) {
+    self.setHighlightedMarkerIcon = function(clickedMarker) {
         markers.forEach(function(marker) {
             marker.setIcon(defaultIcon);
         });
 
         clickedMarker.setIcon(highlightedIcon);
-    }
+    };
 
-    function makeMarkerIcon(markerColor) {
-        var markerImage = new google.maps.MarkerImage(
-            'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
-            '|40|_|%E2%80%A2',
-            new google.maps.Size(21, 34),
-            new google.maps.Point(0, 0),
-            new google.maps.Point(10, 34),
-            new google.maps.Size(21, 34));
-        return markerImage;
-    }
-
-    function setInfoContent(marker, infowindow) {
-        infowindow.setContent('<div class="info-window"><h3>' + marker.name + '</h3><p>' + marker.vicinity + '</p><a class="info-window-url" href="https://foursquare.com/" target="_blank">Powered By Foursquare <i class="fa fa-foursquare fa-lg" aria-hidden="true"></i></a></div>');
-    }
-
+    // Loop through markers and display them on the map
     self.showListings = function() {
         // Extend the boundaries of the map for each marker and display the marker
         var bounds = new google.maps.LatLngBounds();
@@ -218,38 +217,40 @@ var ViewModel = function() {
         map.fitBounds(bounds);
 
         self.enableButton(false);
-    }
+    };
 
-    // This function will loop through the listings and hide them all.
+    // This function will loop through the markers and hide them all.
     self.hideListings = function() {
         for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(null);
         }
-
         self.enableButton(true);
+    };
+
+    // Make customized Marker Icon
+    function makeMarkerIcon(markerColor) {
+        var markerImage = new google.maps.MarkerImage(
+            'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor +
+            '|40|_|%E2%80%A2',
+            new google.maps.Size(21, 34),
+            new google.maps.Point(0, 0),
+            new google.maps.Point(10, 34),
+            new google.maps.Size(21, 34));
+        return markerImage;
     }
 
+    // Set infow window when marker is clicked
+    function setInfoContent(marker, infowindow) {
+        infowindow.setContent('<div class="info-window"><h3>' + marker.name + '</h3><p>' + marker.vicinity + '</p><a class="info-window-url" href="https://foursquare.com/" target="_blank">Powered By Foursquare <i class="fa fa-foursquare fa-lg" aria-hidden="true"></i></a></div>');
+    }   
+
+    // when screen resized function called that redraws markers and centers them on the map
     $(window).resize(function() {
         setTimeout(function() {
             self.showListings();
         }, 1);
-    });
-
-    function getPhotos(item) {
-        var baseImgURL = 'https://irs3.4sqi.net/img/general/'; // base url to retrieve venue photos
-
-        $.ajax({
-            url: 'https://api.foursquare.com/v2/venues/' + item.venue.id + '/photos?limit=1&client_id=RG0BDGPCIXRYCKU3MGO2K4NSMZQMEZG3PVX1IEQQ1W5V5OMF&client_secret=1OVPLSTAD3E0PNUHRMZVSFC24NJS0YATRZSTZ0BCWGPU5AKU&v=20130815',
-            dataType: 'jsonp',
-            success: function(data) {
-                var imgItems = data.response.photos.items[0].suffix;
-                var venueImgURL = 'https://irs3.4sqi.net/img/general/width100' + imgItems;
-                item.venue.photos = venueImgURL;
-                self.placeList.push(new Venue(item));
-            }
-        });
-    }
-}
+    });    
+};
 
 //Function called from script tag to load the map
 function initMap() {

@@ -164,7 +164,7 @@ body {
 
 /*Two properties to handle different appearance of rating icon*/
 #left-rating {
-    visibility: visible;
+    /*visibility: visible;*/
 }
 #right-rating {
     visibility: hidden;
