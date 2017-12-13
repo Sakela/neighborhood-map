@@ -13,12 +13,13 @@
          <div>            
             <img class="menu-marker-btn" src="dist/img/marker-on.svg" data-bind="click: showListings, enable: enableButton">
             <img class="menu-marker-btn" src="dist/img/marker-off.svg" data-bind="click: hideListings, disable: enableButton">
-            <input id="menu-city-search" type="search" name ="search" placeholder="Search City" data-bind="value: cityInput">
-            <img id="menu-toggle-list" src="dist/img/menu.png" data-bind="click: toggleList">
+            <input id="menu-city-search" type="search" name ="search" placeholder="Search City" data-bind="event: { change: cityChanger }, value: cityInput, valueUpdate: 'afterkeydown'">
+            <!-- Toggles Venue list on click -->
+            <img id="menu-toggle-list" src="dist/img/menu.png" data-bind="click: function() { toggleVenues(!toggleVenues()) }">
          </div>
       </header>
       <!-- List of venues with Filter field -->
-      <div class="list hidden">
+      <div class="list" data-bind="css: { hidden: toggleVenues }">
          <div class="list-filter">
             <i class="fa fa-filter"></i>
             <i class="fa fa-times" aria-hidden="true" data-bind="click: clearFilter"></i>
@@ -27,6 +28,9 @@
          <!-- Foursquare Attribution -->
          <div id="foursquare-block">
             <a id="foursquare-block-content" href="https://foursquare.com/" target="_blank">Powered By Foursquare <i class="fa fa-foursquare fa-lg" aria-hidden="true"></i></a>
+         </div>
+         <div class="error-image">
+            <h2 class="error-image-content"> Sorry! There was an Error loading images :( </h2>
          </div>
          <!-- Loop through array of venues -->
          <ul class="list-block" data-bind="foreach: searchResults">
@@ -59,6 +63,7 @@
       <div class="error-block">
          <h2 class="error-search">City search failed! Please enter valid city name and try again. </h2>
          <h2 class="error">Error: The list of venues/markers was not generated :( </h2>
+         <h2 class="error-map">Error: There was a problem generating map. Please try again later! :( </h2>
       </div>
       <!-- Google Map content -->
       <div id="map"></div>

@@ -39,6 +39,7 @@ var ViewModel = function() {
     self.enableButton = ko.observable(true);
     self.searchText = ko.observable('');
     self.cityInput = ko.observable(defaultCity);
+    self.toggleVenues = ko.observable(true);
 
     // Filter search method for venues in the list
     self.searchResults = ko.computed(function() {
@@ -55,15 +56,10 @@ var ViewModel = function() {
         return matches;
     });
 
-    // Show/hide the list of venues for mobile screens
-    self.toggleList = function() {
-        var list = $(".list");
-        list.toggleClass('hidden');
-    };
-
     // Clears input in the Filter of venues
     self.clearFilter = function() {
         self.searchText('');
+        self.showListings();
     };
 
     //Handles chosen list item and saves into ViewModel current venue obesrvable
@@ -97,10 +93,27 @@ var ViewModel = function() {
             url: 'https://api.foursquare.com/v2/venues/' + item.venue.id + '/photos?limit=1&client_id=RG0BDGPCIXRYCKU3MGO2K4NSMZQMEZG3PVX1IEQQ1W5V5OMF&client_secret=1OVPLSTAD3E0PNUHRMZVSFC24NJS0YATRZSTZ0BCWGPU5AKU&v=20130815',
             dataType: 'jsonp',
             success: function(data) {
-                var imgItems = data.response.photos.items[0].suffix;
-                var venueImgURL = 'https://irs3.4sqi.net/img/general/width100' + imgItems;
-                item.venue.photos = venueImgURL;
-                self.placeList.push(new Venue(item));
+                if (data.meta.code === 200) {
+                    if (data.response.photos.items[0] !== undefined) {
+                        var imgItems = data.response.photos.items[0].suffix;
+                        var venueImgURL = 'https://irs3.4sqi.net/img/general/width100' + imgItems;
+                        item.venue.photos = venueImgURL;
+                        self.placeList.push(new Venue(item));
+                    } else {
+                        var venueImgURL = 'http://www.freeiconspng.com/uploads/no-image-icon-10.png';
+                        item.venue.photos = venueImgURL;
+                        self.placeList.push(new Venue(item));
+                    }
+                } else {
+                    var venueImgURL = 'http://www.freeiconspng.com/uploads/no-image-icon-10.png';
+                    item.venue.photos = venueImgURL;
+                    self.placeList.push(new Venue(item));
+                    $('.error-image').css("display", "block");
+                }                             
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                $('.error').css("display", "block");
+                $('.error-image').css("display", "block");
             }
         });
     };
@@ -135,17 +148,16 @@ var ViewModel = function() {
 
     // Call city search with current input in City Search field
     self.searchCity(self.cityInput());
+    
     //On change listener for City Search input, and fire off 'searchCity' function if has new input 
-    $('#menu-city-search').change(function() {
+    self.cityChanger = function() {
         self.hideListings();
         markers.length = 0;
         self.placeList().length = 0;
-
-        var inputValue = $('#menu-city-search').val();
-        self.cityInput(inputValue);
+        // self.cityInput.valueHasMutated();
         self.searchCity(self.cityInput());
-    });
-
+    }
+    
     //Binds display of the location from the list and the marker on the map
     self.bindPlaceMarker = function(currentPlace) {
         // self.getDetails(currentPlace.id(), currentPlace);
@@ -165,6 +177,8 @@ var ViewModel = function() {
                     self.setHighlightedMarkerIcon(marker);
                     map.panTo(marker.position);
                 }
+            } else {
+                marker.setMap(null);
             }
         });
     };
@@ -183,12 +197,18 @@ var ViewModel = function() {
             vicinity: item.venue.location.address
         });
 
-        // Open info window by clicking the Marker
+        // Open info window by clicking the Marker and filtering out all other Markers
         google.maps.event.addListener(marker, 'click', function() {
-            self.setHighlightedMarkerIcon(this);
-            setInfoContent(marker, infowindow);
-            infowindow.open(map, this);
-            self.searchText(this.name);
+            markers.forEach(function(markerArrayItem) {
+                if (marker.id === markerArrayItem.id) {
+                    self.setHighlightedMarkerIcon(marker);
+                    setInfoContent(marker, infowindow);
+                    infowindow.open(map, marker);
+                    self.searchText(marker.name);
+                } else {
+                    markerArrayItem.setMap(null);
+                }
+            });            
         });
 
         markers.push(marker);
@@ -239,7 +259,7 @@ var ViewModel = function() {
         return markerImage;
     }
 
-    // Set infow window when marker is clicked
+    // Set info window when marker is clicked
     function setInfoContent(marker, infowindow) {
         infowindow.setContent('<div class="info-window"><h3>' + marker.name + '</h3><p>' + marker.vicinity + '</p><a class="info-window-url" href="https://foursquare.com/" target="_blank">Powered By Foursquare <i class="fa fa-foursquare fa-lg" aria-hidden="true"></i></a></div>');
     }   
@@ -252,6 +272,12 @@ var ViewModel = function() {
     });    
 };
 
+// Error handling for Google Map
+function errorMap() {
+    $('.error-map').css("display", "block");
+    $('.error').css("display", "block");
+}
+
 //Function called from script tag to load the map
 function initMap() {
     "use strict";
@@ -263,6 +289,8 @@ function initMap() {
         },
         zoom: 13
     });
+
+    map.onerror =  function(){console.log('error')};
 
     //Run Knockout and create ViewModel
     ko.applyBindings(new ViewModel());

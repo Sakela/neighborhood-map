@@ -1,4 +1,4 @@
-# Neighbourhood Map Project with Udacity (Project 6)
+# Neighbourhood Map Project with Udacity (Project 5)
 
 This project is a single page application that takes advantage of Knockout.js framework to organize the code structure with MVVM design pattern.
 > MVVM is just the name used by Knockout to describe the process of connecting Model to the View with some mediator.
@@ -16,6 +16,9 @@ Download the Github repo of the project or clone it to your computer
 $ cd to the folder you want to save project
 $ git clone https://github.com/Sakela/neighborhood-map.git
 ```
+To run the application you need to go to the destination where you have saved the project and open Index.html file in any browser of your choice from the root of the project's folder.
+
+This project utilizes Grunt as its Task Runner.
 To work with Grunt you will need to use Node Package Manager (NPM) that you can use by downloading [NodeJS](https://nodejs.org/en/).
 You can learn on how to get started with [Grunt here](https://gruntjs.com/getting-started)
 ```sh
@@ -31,6 +34,19 @@ npm install grunt-contrib-cssmin --save-dev
 - cssmin (minify CSS files)
 - uglify (optimize JS files)
 - htmlmin (minify HTML file)
+
+To run all tasks just type:
+```sh
+grunt                                         // in the command line
+```
+
+#### Run local web server
+In order to test the application with local server you need to install [Python](https://www.python.org/downloads/) and download a tool called [ngrok](https://ngrok.com/download).
+* In the command line go to Neighborhood-Map folder
+* Type python ```python -m SimpleHTTPServer 8080``` to start server
+* Navigate to the folder where you downloaded ```ngrok``` in the terminal
+* Run ```ngrok http 8080```
+Now you can test application with the retrieved URL.
 
 ### Project Functionality
 The application is responsive and can be used across modern browsers, tablets, and phones. Achieved with CSS media queries. 
