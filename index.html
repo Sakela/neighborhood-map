@@ -23,7 +23,7 @@
          <div class="list-filter">
             <i class="fa fa-filter"></i>
             <i class="fa fa-times" aria-hidden="true" data-bind="click: clearFilter"></i>
-            <input placeholder="Filter By Name" data-bind="textInput: searchText">
+            <input placeholder="Filter By Name" data-bind="event : { change: filterMarkers }, event:{enterkey: failEnterKey}, textInput: searchText">
          </div>
          <!-- Foursquare Attribution -->
          <div id="foursquare-block">
@@ -74,6 +74,6 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
       <script src="dist/js/libs/jquery.min.js"></script>
       <script src="dist/js/main.min.js"></script>
-      <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDV2SfPhFHchL_UBJp9HT3b1YG7sjo4GNs&libraries=places&callback=initMap"></script>
+      <script async defer onerror="errorMap()" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDV2SfPhFHchL_UBJp9HT3b1YG7sjo4GNs&libraries=places&callback=initMap"></script>
    </body>
 </html>

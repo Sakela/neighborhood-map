@@ -41,11 +41,34 @@ var ViewModel = function() {
     self.cityInput = ko.observable(defaultCity);
     self.toggleVenues = ko.observable(true);
 
+    // Filter Markers with input search
+    self.filterMarkers = ko.computed(function() {
+        // Regex search for current value of the Filter
+        var re = new RegExp(self.searchText(), 'i');
+
+        // Iterate over observable array of venues
+        markers.forEach(function(marker) {
+            // Save matching venue to the array
+            if (marker.name.search(re) !== -1) {
+                marker.setMap(map);
+            } else {
+                marker.setMap(null);
+            }
+        });
+    });
+
+    // Fail ability to press "Enter" key
+    self.failEnterKey = function() {
+        return false;
+    }
+
     // Filter search method for venues in the list
     self.searchResults = ko.computed(function() {
         var matches = [];
+
         // Regex search for current value of the Filter
         var re = new RegExp(self.searchText(), 'i');
+
         // Iterate over observable array of venues
         self.placeList().forEach(function(place) {
             // Save matching venue to the array
@@ -53,8 +76,9 @@ var ViewModel = function() {
                 matches.push(place);
             }
         });
+
         return matches;
-    });
+    });    
 
     // Clears input in the Filter of venues
     self.clearFilter = function() {
@@ -175,7 +199,8 @@ var ViewModel = function() {
                     setInfoContent(marker, infowindow);
                     infowindow.open(map, marker);
                     self.setHighlightedMarkerIcon(marker);
-                    map.panTo(marker.position);
+                    map.setCenter(marker.getPosition());
+                    map.setZoom(16);
                 }
             } else {
                 marker.setMap(null);
@@ -205,6 +230,8 @@ var ViewModel = function() {
                     setInfoContent(marker, infowindow);
                     infowindow.open(map, marker);
                     self.searchText(marker.name);
+                    map.setCenter(marker.getPosition());
+                    map.setZoom(16);
                 } else {
                     markerArrayItem.setMap(null);
                 }
@@ -265,11 +292,9 @@ var ViewModel = function() {
     }   
 
     // when screen resized function called that redraws markers and centers them on the map
-    $(window).resize(function() {
-        setTimeout(function() {
-            self.showListings();
-        }, 1);
-    });    
+    google.maps.event.addDomListener(window, 'resize', function() {
+        self.showListings(); 
+    }); 
 };
 
 // Error handling for Google Map

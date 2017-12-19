@@ -23,7 +23,7 @@
          <div class="list-filter">
             <i class="fa fa-filter"></i>
             <i class="fa fa-times" aria-hidden="true" data-bind="click: clearFilter"></i>
-            <input placeholder="Filter By Name" data-bind="textInput: searchText">
+            <input placeholder="Filter By Name" data-bind="event : { change: filterMarkers }, event:{enterkey: failEnterKey}, textInput: searchText">
          </div>
          <!-- Foursquare Attribution -->
          <div id="foursquare-block">
