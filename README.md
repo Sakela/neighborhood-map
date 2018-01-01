@@ -1,4 +1,4 @@
-# Neighborhood Map (Udacity Front-End Project 5)
+# Neighborhood Map (Udacity Front-End Project 6)
 
 This project is a single page application that takes advantage of Knockout.js framework to organize the code structure with MVVM design pattern.
 > MVVM is just the name used by Knockout to describe the process of connecting Model to the View with some mediator.
